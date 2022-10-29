@@ -22,7 +22,7 @@ int main()
     }
 
     // prepare touch pad
-    TouchRecognizer touchRecognizer;
+    TouchRecognizer touchRecognizer = TouchRecognizer();
 
     // prepare variables
     cv::Mat depthFrame;
@@ -30,16 +30,17 @@ int main()
     cv::Mat touchFrame;
     auto running = true;
 
-    // calibrate
-    
-    /*~~~~~~~~~~~*
-     * YOUR CODE *
-     * GOES HERE *
-     *~~~~~~~~~~~*/
+    kinect.getDepthFrame(depthFrame);
+    kinect.getColorFrame(colorFrame);
+
+    touchRecognizer.calibrate(depthFrame);
 
     // prepare windows - this isn't necessary, but it allows to assign useful positions
     cv::namedWindow("color");
     cv::namedWindow("depth");
+
+    
+    cv::namedWindow("debug");
     /*~~~~~~~~~~~~~~~*
      * DEBUG WINDOWS *
      * COULD GO HERE *
@@ -64,17 +65,15 @@ int main()
 
         // run touch recognizer
         
-        /*~~~~~~~~~~~*
-         * YOUR CODE *
-         * GOES HERE *
-         *~~~~~~~~~~~*/
+        std::vector<cv::RotatedRect> positions = touchRecognizer.recognize(depthFrame);
 
         // run visualizer - there may be no position
         
-        /*~~~~~~~~~~~*
-         * YOUR CODE *
-         * GOES HERE *
-         *~~~~~~~~~~~*/
+        
+        for (const auto& position : positions)
+        {
+            TouchVisualizer::draw(touchFrame, position, touchFrame);
+        }
 
         // show frames
         auto depthFrameUnscaled = depthFrame.clone();
@@ -91,10 +90,8 @@ int main()
             running = false;
             break;
 		case 0x0d: // enter - calibrate again
-            /*~~~~~~~~~~~*
-             * YOUR CODE *
-             * GOES HERE *
-             *~~~~~~~~~~~*/
+            kinect.getDepthFrame(depthFrame);
+            touchRecognizer.calibrate(depthFrame);
             break;
         default:
             break;

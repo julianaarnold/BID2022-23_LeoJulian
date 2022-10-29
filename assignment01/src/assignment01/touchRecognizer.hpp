@@ -10,8 +10,5 @@ public:
     std::vector<cv::RotatedRect> recognize(const cv::Mat & depthFrame) const;
 private:
     cv::Mat m_background;
-    /*~~~~~~~~~~~~~~~~*
-     * YOU MAY DEFINE *
-     * CONSTANTS HERE *
-     *~~~~~~~~~~~~~~~~*/
+    
 };
