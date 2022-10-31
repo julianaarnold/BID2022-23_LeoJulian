@@ -28,6 +28,7 @@ int main()
     cv::Mat depthFrame;
     cv::Mat colorFrame;
     cv::Mat touchFrame;
+    cv::Mat drawFrame;
     auto running = true;
 
     kinect.getDepthFrame(depthFrame);
@@ -38,42 +39,61 @@ int main()
     // prepare windows - this isn't necessary, but it allows to assign useful positions
     cv::namedWindow("color");
     cv::namedWindow("depth");
-
-    
+    cv::namedWindow("touch");
     cv::namedWindow("debug");
-    /*~~~~~~~~~~~~~~~*
-     * DEBUG WINDOWS *
-     * COULD GO HERE *
-     *~~~~~~~~~~~~~~~*/
+    cv::namedWindow("draw");
 
     // move windows
     const auto xOffset = colorFrame.cols;
     const auto yOffset = colorFrame.rows;
     cv::moveWindow("color", 0 * xOffset, 0 * yOffset);
     cv::moveWindow("depth", 1 * xOffset, 0 * yOffset);
+    cv::moveWindow("touch", 0 * xOffset, 1 * yOffset);
+    cv::moveWindow("draw", 1 * xOffset, 1 * yOffset);
+    cv::moveWindow("debug", 2 * xOffset, 1 * yOffset);
     /*~~~~~~~~~~~~~~~*
      * DEBUG WINDOWS *
      * COULD GO HERE *
      *~~~~~~~~~~~~~~~*/
 
+    std::vector<cv::RotatedRect> drawnPositions = std::vector<cv::RotatedRect>();
+    std::vector<int> positionsFrameIndex = std::vector<int>();
+
+    int currentFrameIndex = 0;
     while(running)
     {
         // update frames
         kinect.getDepthFrame(depthFrame);
         kinect.getColorFrame(colorFrame);
         colorFrame.copyTo(touchFrame);
+        colorFrame.copyTo(drawFrame);
 
         // run touch recognizer
         
-        std::vector<cv::RotatedRect> positions = touchRecognizer.recognize(depthFrame);
+        std::vector<cv::RotatedRect> currentPositions = touchRecognizer.recognize(depthFrame);
+        
+        for (const auto& position : currentPositions)
+        {
+            drawnPositions.push_back(position);
+            positionsFrameIndex.push_back(currentFrameIndex);
+        }
+
+        /*
+        for (const auto& position : drawnPositions)
+        {
+            printf("x: %f, y: %f, w: %f, h: %f, a: %f", position.center.x, position.center.y, position.size.width, position.size.height, position.angle);
+        }*/
+
+        //printf("size: %d\n", drawnPositions.size());
+        
 
         // run visualizer - there may be no position
-        
-        
-        for (const auto& position : positions)
+        for (const auto& position : drawnPositions)
         {
             TouchVisualizer::draw(touchFrame, position, touchFrame);
         }
+
+        DrawVisualizer::draw(drawFrame, drawnPositions, positionsFrameIndex, drawFrame);
 
         // show frames
         auto depthFrameUnscaled = depthFrame.clone();
@@ -81,6 +101,9 @@ int main()
         cv::imshow("depth", depthFrame);
         cv::imshow("color", colorFrame);
 		cv::imshow("touch", touchFrame);
+		cv::imshow("draw", drawFrame);
+
+        currentFrameIndex++;
 
         // check for keypresses
         const auto key = cv::waitKey(10);
@@ -92,6 +115,8 @@ int main()
 		case 0x0d: // enter - calibrate again
             kinect.getDepthFrame(depthFrame);
             touchRecognizer.calibrate(depthFrame);
+            drawnPositions.clear();
+            positionsFrameIndex.clear();
             break;
         default:
             break;

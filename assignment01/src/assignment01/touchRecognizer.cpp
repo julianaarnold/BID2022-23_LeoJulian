@@ -31,7 +31,13 @@ std::vector<cv::RotatedRect> TouchRecognizer::recognize(const cv::Mat& depthFram
     // find bounding boxes
     for (const auto& contour : contours)
     {
-        positions.push_back(cv::minAreaRect(contour));
+        cv::RotatedRect rect = cv::minAreaRect(contour);
+
+        // filter out small bounding boxes
+        if (rect.size.area() > 500)
+        {
+            positions.push_back(rect);
+        }
     }
 
 	cv::imshow("debug",  touch * 100);

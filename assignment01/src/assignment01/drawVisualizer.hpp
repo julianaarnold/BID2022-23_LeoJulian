@@ -1,11 +1,10 @@
 #pragma once
 
 #include <opencv2/opencv.hpp>
+#include <vector>
 
 class DrawVisualizer
 {
-    /*~~~~~~~~~~~~~~~~~~*
-     * BONUS ASSIGNMENT *
-     * COULD GO IN HERE *
-     *~~~~~~~~~~~~~~~~~~*/
+    public:
+        static void draw(cv::Mat & frame, std::vector<cv::RotatedRect> & positions, std::vector<int> & frameIndices, cv::Mat & output);
 };
