@@ -76,3 +76,7 @@ endmacro()
 
 add_assignment("assignment00")
 add_assignment("assignment01")
+set(assignment02_additional_headers "src/assignment01/touchRecognizer.hpp")
+set(assignment02_additional_sources "src/assignment01/touchRecognizer.cpp")
+add_assignment("assignment02")
+configure_file("${assignment02_source_dir}/pendigits.tra" "${CMAKE_CURRENT_BINARY_DIR}")
