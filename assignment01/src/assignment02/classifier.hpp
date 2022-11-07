@@ -17,4 +17,5 @@ private:
     std::vector<cv::Point2f> m_simplifiedPath;
     void simplify(std::vector<cv::Point2f> path);
     void normalize(std::vector<cv::Point2f>& path);
+    void flipY(std::vector<cv::Point2f>& path);
 };

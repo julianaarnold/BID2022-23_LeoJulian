@@ -15,7 +15,7 @@ std::vector<cv::RotatedRect> TouchRecognizer::recognize(const cv::Mat& depthFram
     cv::Mat touch = (m_background - depthFrame);
     // threshold to zero
     cv::threshold(touch, touch, 10, 255, cv::THRESH_TOZERO);
-    cv::threshold(touch, touch, 60, 255, cv::THRESH_TOZERO_INV);
+    cv::threshold(touch, touch, 40, 255, cv::THRESH_TOZERO_INV);
 
     // blur to reduce noise
     cv::blur(touch, touch, cv::Size(21, 21));

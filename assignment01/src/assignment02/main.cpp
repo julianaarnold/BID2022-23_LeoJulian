@@ -44,6 +44,8 @@ int main()
     // prepare windows - this isn't necessary, but it allows to assign useful positions
     cv::namedWindow("color");
     cv::namedWindow("depth");
+    
+    cv::namedWindow("normalized");
     cv::namedWindow("output");
 
     // move windows
@@ -53,6 +55,7 @@ int main()
     cv::moveWindow("color", 0 * xOffset, 0 * yOffset);
     cv::moveWindow("depth", 1 * xOffset, 0 * yOffset);
     cv::moveWindow("output", 0 * xOffset, 1 * yOffset);
+    cv::moveWindow("normalized", 1 * xOffset, 1 * yOffset);
 
     while(running)
     {
@@ -73,16 +76,16 @@ int main()
             // done drawing -> classify
 
             classifier.classify(path);
-            digitVisualizer.draw(colorFrame, classifier.getSimplifiedPath(), outputFrame);
+		    digitVisualizer.setResult(classifier.getResult());
+            digitVisualizer.setSimplifiedPath(classifier.getSimplifiedPath());
 
+            // visualize results
+            digitVisualizer.draw(colorFrame, std::vector<cv::Point2f>(), outputFrame);
 
             // after classifying, you should update the visualizer like this:
 		    // digitVisualizer.setSimplifiedPath(classifier.getSimplifiedPath());
 		    // digitVisualizer.setResult(classifier.getResult());
 		}
-
-        // visualize results
-        
 
         // show frames
         auto depthFrameUnscaled = depthFrame.clone();
