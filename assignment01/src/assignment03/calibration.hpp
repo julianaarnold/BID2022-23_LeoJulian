@@ -33,4 +33,5 @@ private:
 
     cv::Mat m_cameraToGame;
     cv::Mat m_gameToProjector;
+    cv::Mat m_testImage;
 };
