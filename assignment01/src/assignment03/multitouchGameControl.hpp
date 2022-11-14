@@ -12,8 +12,5 @@ public:
 protected:
     Game& m_game;
     HomograpyCalibrator& m_calibrator;
-    /*~~~~~~~~~~~~~~~~*
-     * YOU MAY DEFINE *
-     * VARIABLES HERE *
-     *~~~~~~~~~~~~~~~~*/
+    
 };

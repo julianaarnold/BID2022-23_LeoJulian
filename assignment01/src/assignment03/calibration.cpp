@@ -20,6 +20,9 @@ void HomograpyCalibrator::toggleFullscreen()
 void HomograpyCalibrator::draw(const cv::Mat& colorFrame)
 {
     m_canvas = cv::Mat::zeros(m_canvas.rows, m_canvas.cols, m_canvas.type());
+    m_cameraHeight = colorFrame.rows;
+    m_cameraWidth = colorFrame.cols;
+
 
     if (m_isFullscreen && m_corners.size() > 3)
     {
@@ -52,6 +55,13 @@ void HomograpyCalibrator::computeHomography()
     float gameHeight = (float) Game::gameCanvasSize().height;
     float gameWidth = (float) Game::gameCanvasSize().width;
 
+    std::vector<cv::Point2f> scaledCameraCorners = std::vector<cv::Point2f>();
+    for (auto &corner: cameraCorners()) {
+        scaledCameraCorners.push_back(
+            cv::Point2f(corner.x * m_cameraWidth / m_canvas.cols, corner.y * m_cameraHeight / m_canvas.rows)
+        );
+    }
+
     std::vector<cv::Point2f> scaledProjectorCorners = std::vector<cv::Point2f>();
     for (auto &corner: projectorCorners()) {
         scaledProjectorCorners.push_back(
@@ -59,7 +69,7 @@ void HomograpyCalibrator::computeHomography()
         );
     }
 
-    m_cameraToGame = cv::getPerspectiveTransform(cameraCorners(), Game::gameCorners());
+    m_cameraToGame = cv::getPerspectiveTransform(scaledCameraCorners, Game::gameCorners());
     m_gameToProjector = cv::getPerspectiveTransform(Game::gameCorners(), scaledProjectorCorners);
     
     // You should assign something to m_cameraToGame and m_gameToProjector.
@@ -70,13 +80,13 @@ void HomograpyCalibrator::computeHomography()
 
 cv::Point2f HomograpyCalibrator::cameraToGame(const cv::Point2f& point) const
 {
-    cv::Mat_<float> pointMatrix(3,1);
+    cv::Mat_<double>pointMatrix(3,1);
     pointMatrix(0,0) = point.x; 
     pointMatrix(1,0) = point.y; 
     pointMatrix(2,0) = 1.0;
     // inverse???
-    cv::Mat_<float> transformedMatrix = m_cameraToGame * pointMatrix;
-
+    cv::Mat_<double> transformedMatrix = m_cameraToGame * pointMatrix;
+    
     return cv::Point2f(transformedMatrix(0,0), transformedMatrix(1,0));
     // Use m_cameraToGame to transform the point.
     // Tip: You can only multiply matrices with each other in OpenCV, so you'll have to build one (or build a cv::Vec3 and convert that).

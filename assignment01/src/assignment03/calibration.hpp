@@ -30,6 +30,8 @@ private:
 
     std::vector<cv::Point2i> m_corners;
     bool m_cornersComplete = false;
+    float m_cameraWidth;
+    float m_cameraHeight;
 
     cv::Mat m_cameraToGame;
     cv::Mat m_gameToProjector;
